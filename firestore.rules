@@ -1,0 +1,71 @@
+rules_version = '2';
+
+// Franchise Four: Firestore security rules.
+// Data lives under /leagues/{leagueId}/... . The person who creates a league
+// becomes its commissioner (league/main.admin). Only the commissioner can
+// change settings, stats and finalized weeks. Managers can only write their
+// own member and lineup documents.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    match /leagues/{lid} {
+
+      function isAdmin() {
+        return signedIn() &&
+          get(/databases/$(database)/documents/leagues/$(lid)/league/main).data.admin == request.auth.uid;
+      }
+
+      // League settings. The first person to create it becomes the commissioner.
+      match /league/main {
+        allow read: if signedIn();
+        allow create: if signedIn() && request.resource.data.admin == request.auth.uid;
+        allow update: if isAdmin() && request.resource.data.admin == resource.data.admin;
+        allow delete: if isAdmin();
+      }
+
+      // One document per manager, keyed by their user id.
+      match /members/{uid} {
+        allow read: if signedIn();
+        allow create, update: if signedIn() && request.auth.uid == uid;
+        allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+      }
+
+      // Lineup arrangements: the owner or the commissioner.
+      match /lineups/{uid} {
+        allow read: if signedIn();
+        allow write: if signedIn() && (request.auth.uid == uid || isAdmin());
+      }
+
+      // Scoring inputs and finalized results: commissioner only.
+      match /stats/{doc} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+      match /final/{doc} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+
+      // Draft picks and trades: any signed-in league member (friends-league trust).
+      match /draft/{doc} {
+        allow read, write: if signedIn();
+      }
+      match /trades/{doc} {
+        allow read, write: if signedIn();
+      }
+
+      // Chat: anyone can post as themselves (or a system line); the commissioner
+      // or the author can delete.
+      match /chat/{doc} {
+        allow read: if signedIn();
+        allow create: if signedIn() && request.resource.data.u in [request.auth.uid, ''];
+        allow delete: if isAdmin() || (signedIn() && resource.data.u == request.auth.uid);
+      }
+    }
+  }
+}
