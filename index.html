@@ -329,6 +329,21 @@ img.avatar{object-fit:cover;background:var(--panel2);border:1px solid var(--line
 @media (max-width:1180px){.phase{display:none}}
 @media (max-width:640px){.tgrid{grid-template-columns:1fr}.tarrow{justify-self:center}}
 .phase:empty{display:none}
+
+/* v5 additions: draft clock, roster lock, projections, free agency */
+.dclock{flex:none;min-width:120px;text-align:right}
+.dclock.off{padding:4px 0}
+.dc-num{font-size:34px;line-height:1;color:var(--led);text-shadow:0 0 18px rgba(255,184,36,.3)}
+.dc-bar{margin-top:6px;height:6px;width:120px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin-left:auto}
+.dc-bar>div{height:100%;background:var(--led);border-radius:4px;transition:width 1s linear}
+.big-total.proj2{background:var(--panel2);border:1px solid var(--line)}
+.big-total.proj2 b{color:var(--muted)}
+.proj{padding:4px 20px 14px}
+.proj-nums,.proj-pct{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.winbar{display:flex;height:8px;border-radius:5px;overflow:hidden;background:var(--panel2)}
+.winbar .wa{background:var(--amber)}
+.winbar .wb{background:var(--line)}
+.tile .btn{margin-top:2px}
 </style>
 </head>
 <body>
@@ -366,8 +381,8 @@ var META={
   NHL:{color:'#25B0C4',ev:'G',evName:'Goals',rec:'2025-26 season',gpw:3}
 };
 var RAW={
-NFL:'ARI|Arizona Cardinals|97233F|FFFFFF|1|0|NFC West\nATL|Atlanta Falcons|A71930|000000|0|1|NFC South\nBAL|Baltimore Ravens|241773|9E7C0C|1|0|AFC North\nBUF|Buffalo Bills|00338D|C60C30|2|0|AFC East\nCAR|Carolina Panthers|0085CA|101820|0|1|NFC South\nCHI|Chicago Bears|0B162A|C83803|1|0|NFC North\nCIN|Cincinnati Bengals|FB4F14|000000|1|0|AFC North\nCLE|Cleveland Browns|311D00|FF3C00|0|1|AFC North\nDAL|Dallas Cowboys|003594|869397|0|1|NFC East\nDEN|Denver Broncos|FB4F14|002244|0|1|AFC West\nDET|Detroit Lions|0076B6|B0B7BC|1|1|NFC North\nGB|Green Bay Packers|203731|FFB612|0|1|NFC North\nHOU|Houston Texans|03202F|A71930|0|1|AFC South\nIND|Indianapolis Colts|002C5F|A2AAAD|0|1|AFC South\nJAX|Jacksonville Jaguars|006778|D7A22A|1|0|AFC South\nKC|Kansas City Chiefs|E31837|FFB81C|1|0|AFC West\nLV|Las Vegas Raiders|000000|A5ACAF|1|0|AFC West\nLAC|Los Angeles Chargers|0080C6|FFC20E|0|1|AFC West\nLAR|Los Angeles Rams|003594|FFA300|0|1|NFC West\nMIA|Miami Dolphins|008E97|FC4C02|0|1|AFC East\nMIN|Minnesota Vikings|4F2683|FFC62F|1|0|NFC North\nNE|New England Patriots|002244|C60C30|0|1|AFC East\nNO|New Orleans Saints|D3BC8D|101820|0|1|NFC South\nNYG|New York Giants|0B2265|A71930|1|0|NFC East\nNYJ|New York Jets|125740|FFFFFF|1|0|AFC East\nPHI|Philadelphia Eagles|004C54|A5ACAF|1|0|NFC East\nPIT|Pittsburgh Steelers|101820|FFB612|1|0|AFC North\nSF|San Francisco 49ers|AA0000|B3995D|1|0|NFC West\nSEA|Seattle Seahawks|002244|69BE28|1|0|NFC West\nTB|Tampa Bay Buccaneers|D50A0A|34302B|0|1|NFC South\nTEN|Tennessee Titans|4B92DB|0C2340|0|1|AFC South\nWAS|Washington Commanders|5A1414|FFB612|0|1|NFC East',
-MLB:'TB|Tampa Bay Rays|092C5C|8FBCE6|93|60|AL East\nNYY|New York Yankees|0C2340|FFFFFF|89|64|AL East\nBOS|Boston Red Sox|BD3039|0C2340|84|70|AL East\nTOR|Toronto Blue Jays|134A8E|1D2D5C|76|78|AL East\nBAL|Baltimore Orioles|DF4601|000000|75|79|AL East\nCLE|Cleveland Guardians|00385D|E50022|79|75|AL Central\nCWS|Chicago White Sox|27251F|C4CED4|78|76|AL Central\nDET|Detroit Tigers|0C2340|FA4616|73|81|AL Central\nMIN|Minnesota Twins|002B5C|D31145|72|82|AL Central\nKC|Kansas City Royals|004687|BD9B60|67|87|AL Central\nHOU|Houston Astros|002D62|EB6E1F|77|77|AL West\nTEX|Texas Rangers|003278|C0111F|77|77|AL West\nSEA|Seattle Mariners|0C2C56|005C5C|72|82|AL West\nATH|Athletics|003831|EFB21E|61|93|AL West\nLAA|Los Angeles Angels|BA0021|003263|59|95|AL West\nMIL|Milwaukee Brewers|12284B|FFC52F|96|58|NL Central\nCHC|Chicago Cubs|0E3386|CC3433|85|69|NL Central\nPIT|Pittsburgh Pirates|27251F|FDB827|77|77|NL Central\nSTL|St. Louis Cardinals|C41E3A|0C2340|75|79|NL Central\nCIN|Cincinnati Reds|C6011F|000000|72|82|NL Central\nATL|Atlanta Braves|13274F|CE1141|90|64|NL East\nPHI|Philadelphia Phillies|E81828|002D72|85|69|NL East\nMIA|Miami Marlins|00A3E0|EF3340|76|78|NL East\nWSH|Washington Nationals|AB0003|14225A|72|82|NL East\nNYM|New York Mets|002D72|FF5910|70|84|NL East\nLAD|Los Angeles Dodgers|005A9C|FFFFFF|94|60|NL West\nSD|San Diego Padres|2F241D|FFC425|85|69|NL West\nAZ|Arizona Diamondbacks|A71930|E3D4AD|80|74|NL West\nSF|San Francisco Giants|FD5A1E|27251F|64|90|NL West\nCOL|Colorado Rockies|333366|C4CED4|56|98|NL West',
+NFL:'ARI|Arizona Cardinals|97233F|FFFFFF|1|1|NFC West\nATL|Atlanta Falcons|A71930|000000|0|2|NFC South\nBAL|Baltimore Ravens|241773|9E7C0C|1|1|AFC North\nBUF|Buffalo Bills|00338D|C60C30|2|0|AFC East\nCAR|Carolina Panthers|0085CA|101820|1|1|NFC South\nCHI|Chicago Bears|0B162A|C83803|1|1|NFC North\nCIN|Cincinnati Bengals|FB4F14|000000|2|0|AFC North\nCLE|Cleveland Browns|311D00|FF3C00|1|1|AFC North\nDAL|Dallas Cowboys|003594|869397|1|1|NFC East\nDEN|Denver Broncos|FB4F14|002244|1|1|AFC West\nDET|Detroit Lions|0076B6|B0B7BC|1|1|NFC North\nGB|Green Bay Packers|203731|FFB612|1|1|NFC North\nHOU|Houston Texans|03202F|A71930|0|2|AFC South\nIND|Indianapolis Colts|002C5F|A2AAAD|0|2|AFC South\nJAX|Jacksonville Jaguars|006778|D7A22A|1|1|AFC South\nKC|Kansas City Chiefs|E31837|FFB81C|2|0|AFC West\nLV|Las Vegas Raiders|000000|A5ACAF|2|0|AFC West\nLAC|Los Angeles Chargers|0080C6|FFC20E|0|2|AFC West\nLAR|Los Angeles Rams|003594|FFA300|1|1|NFC West\nMIA|Miami Dolphins|008E97|FC4C02|0|2|AFC East\nMIN|Minnesota Vikings|4F2683|FFC62F|2|0|NFC North\nNE|New England Patriots|002244|C60C30|1|1|AFC East\nNO|New Orleans Saints|D3BC8D|101820|1|1|NFC South\nNYG|New York Giants|0B2265|A71930|1|1|NFC East\nNYJ|New York Jets|125740|FFFFFF|1|1|AFC East\nPHI|Philadelphia Eagles|004C54|A5ACAF|2|0|NFC East\nPIT|Pittsburgh Steelers|101820|FFB612|1|1|AFC North\nSF|San Francisco 49ers|AA0000|B3995D|2|0|NFC West\nSEA|Seattle Seahawks|002244|69BE28|2|0|NFC West\nTB|Tampa Bay Buccaneers|D50A0A|34302B|0|2|NFC South\nTEN|Tennessee Titans|4B92DB|0C2340|0|2|AFC South\nWAS|Washington Commanders|5A1414|FFB612|0|2|NFC East',
+MLB:'TB|Tampa Bay Rays|092C5C|8FBCE6|96|62|AL East\nNYY|New York Yankees|0C2340|FFFFFF|91|67|AL East\nBOS|Boston Red Sox|BD3039|0C2340|85|73|AL East\nTOR|Toronto Blue Jays|134A8E|1D2D5C|77|82|AL East\nBAL|Baltimore Orioles|DF4601|000000|78|81|AL East\nCLE|Cleveland Guardians|00385D|E50022|82|76|AL Central\nCWS|Chicago White Sox|27251F|C4CED4|81|77|AL Central\nDET|Detroit Tigers|0C2340|FA4616|74|85|AL Central\nMIN|Minnesota Twins|002B5C|D31145|75|84|AL Central\nKC|Kansas City Royals|004687|BD9B60|68|90|AL Central\nHOU|Houston Astros|002D62|EB6E1F|78|80|AL West\nTEX|Texas Rangers|003278|C0111F|78|80|AL West\nSEA|Seattle Mariners|0C2C56|005C5C|74|84|AL West\nATH|Athletics|003831|EFB21E|63|95|AL West\nLAA|Los Angeles Angels|BA0021|003263|60|98|AL West\nMIL|Milwaukee Brewers|12284B|FFC52F|99|59|NL Central\nCHC|Chicago Cubs|0E3386|CC3433|87|71|NL Central\nPIT|Pittsburgh Pirates|27251F|FDB827|81|78|NL Central\nSTL|St. Louis Cardinals|C41E3A|0C2340|77|82|NL Central\nCIN|Cincinnati Reds|C6011F|000000|73|85|NL Central\nATL|Atlanta Braves|13274F|CE1141|93|65|NL East\nPHI|Philadelphia Phillies|E81828|002D72|87|71|NL East\nMIA|Miami Marlins|00A3E0|EF3340|78|80|NL East\nWSH|Washington Nationals|AB0003|14225A|75|84|NL East\nNYM|New York Mets|002D72|FF5910|73|85|NL East\nLAD|Los Angeles Dodgers|005A9C|FFFFFF|97|61|NL West\nSD|San Diego Padres|2F241D|FFC425|88|70|NL West\nAZ|Arizona Diamondbacks|A71930|E3D4AD|84|74|NL West\nSF|San Francisco Giants|FD5A1E|27251F|65|94|NL West\nCOL|Colorado Rockies|333366|C4CED4|57|101|NL West',
 NBA:'DET|Detroit Pistons|C8102E|1D42BA|60|22|East Central\nCLE|Cleveland Cavaliers|860038|FDBB30|52|30|East Central\nMIL|Milwaukee Bucks|00471B|EEE1C6|32|50|East Central\nCHI|Chicago Bulls|CE1141|000000|31|51|East Central\nIND|Indiana Pacers|002D62|FDBB30|19|63|East Central\nATL|Atlanta Hawks|E03A3E|C1D32F|46|36|East Southeast\nORL|Orlando Magic|0077C0|C4CED4|45|37|East Southeast\nCHA|Charlotte Hornets|1D1160|00788C|44|38|East Southeast\nMIA|Miami Heat|98002E|F9A01B|43|39|East Southeast\nWAS|Washington Wizards|002B5C|E31837|17|65|East Southeast\nBOS|Boston Celtics|007A33|BA9653|56|26|East Atlantic\nNYK|New York Knicks|006BB6|F58426|53|29|East Atlantic\nTOR|Toronto Raptors|CE1141|000000|46|36|East Atlantic\nPHI|Philadelphia 76ers|006BB6|ED174C|45|37|East Atlantic\nBKN|Brooklyn Nets|000000|FFFFFF|20|62|East Atlantic\nLAL|Los Angeles Lakers|552583|FDB927|53|29|West Pacific\nPHX|Phoenix Suns|1D1160|E56020|45|37|West Pacific\nLAC|LA Clippers|C8102E|1D428A|42|40|West Pacific\nGSW|Golden State Warriors|1D428A|FFC72C|37|45|West Pacific\nSAC|Sacramento Kings|5A2D81|63727A|22|60|West Pacific\nOKC|Oklahoma City Thunder|007AC1|EF3B24|64|18|West Northwest\nDEN|Denver Nuggets|0E2240|FEC524|54|28|West Northwest\nMIN|Minnesota Timberwolves|0C2340|78BE20|49|33|West Northwest\nPOR|Portland Trail Blazers|E03A3E|000000|42|40|West Northwest\nUTA|Utah Jazz|002B5C|F9A01B|22|60|West Northwest\nSAS|San Antonio Spurs|C4CED4|000000|62|20|West Southwest\nHOU|Houston Rockets|CE1141|000000|52|30|West Southwest\nNOP|New Orleans Pelicans|0C2340|C8102E|26|56|West Southwest\nDAL|Dallas Mavericks|00538C|B8C4CA|26|56|West Southwest\nMEM|Memphis Grizzlies|5D76A9|12173F|25|57|West Southwest',
 NHL:'BUF|Buffalo Sabres|003087|FFB81C|50|23|East Atlantic\nTBL|Tampa Bay Lightning|002868|FFFFFF|50|26|East Atlantic\nMTL|Montreal Canadiens|AF1E2D|192168|48|24|East Atlantic\nBOS|Boston Bruins|FFB81C|000000|45|27|East Atlantic\nOTT|Ottawa Senators|C52032|C69214|44|27|East Atlantic\nDET|Detroit Red Wings|CE1126|FFFFFF|41|31|East Atlantic\nFLA|Florida Panthers|041E42|C8102E|40|38|East Atlantic\nTOR|Toronto Maple Leafs|00205B|FFFFFF|32|36|East Atlantic\nCAR|Carolina Hurricanes|CC0000|000000|53|22|East Metropolitan\nPIT|Pittsburgh Penguins|000000|FCB514|41|25|East Metropolitan\nPHI|Philadelphia Flyers|F74902|000000|43|27|East Metropolitan\nWSH|Washington Capitals|041E42|C8102E|43|30|East Metropolitan\nCBJ|Columbus Blue Jackets|002654|CE1126|40|30|East Metropolitan\nNYI|New York Islanders|00539B|F47D30|43|34|East Metropolitan\nNJD|New Jersey Devils|CE1126|000000|42|37|East Metropolitan\nNYR|New York Rangers|0038A8|CE1126|34|39|East Metropolitan\nVGK|Vegas Golden Knights|B4975A|333F42|39|26|West Pacific\nEDM|Edmonton Oilers|041E42|FF4C00|41|30|West Pacific\nANA|Anaheim Ducks|F47A38|B9975B|43|33|West Pacific\nLAK|Los Angeles Kings|111111|A2AAAD|35|27|West Pacific\nSJS|San Jose Sharks|006D75|EA7200|39|35|West Pacific\nSEA|Seattle Kraken|001628|99D9D9|34|37|West Pacific\nCGY|Calgary Flames|D2001C|FAAF19|34|39|West Pacific\nVAN|Vancouver Canucks|00205B|00843D|25|49|West Pacific\nCOL|Colorado Avalanche|6F263D|236192|55|16|West Central\nDAL|Dallas Stars|006847|8F8F8C|50|20|West Central\nMIN|Minnesota Wild|154734|A6192E|46|24|West Central\nUTA|Utah Mammoth|6CACE4|010101|43|33|West Central\nSTL|St. Louis Blues|002F87|FCB514|37|33|West Central\nNSH|Nashville Predators|FFB81C|041E42|38|34|West Central\nWPG|Winnipeg Jets|041E42|004C97|35|35|West Central\nCHI|Chicago Blackhawks|CF0A2C|000000|29|39|West Central'
 };
@@ -398,6 +413,7 @@ function defaultState(){
   return {v:1,name:'My Franchise League',phase:'setup',
     managers:[1,2,3,4].map(function(i){return {id:'m'+i,name:'Manager '+i,logo:''};}),
     weeks:8,snake:true,maxOwners:1,maxManagers:6,tradeApproval:false,trades:[],holdings:null,
+    draftClock:90,lock:{on:false,at:null},
     scoring:{win:10,ot:3,so:5,loss:-10,goal:1,td:1},
     picks:[],lineups:{},stats:{},final:{},schedule:[]};
 }
@@ -458,11 +474,13 @@ function crest(t,px){
 function held(){return S.holdings||S.picks;}
 function rosterKeys(mid){return held().filter(function(p){return p.mid===mid;}).map(function(p){return p.key;});}
 function computeHoldings(st){
-  var done=(st.trades||[]).filter(function(t){return t.st==='done';}).sort(function(a,b){return (a.doneAt||0)-(b.doneAt||0);});
-  if(!done.length)return null;
+  var moves=(st.trades||[]).filter(function(t){return t.kind==='add'||t.kind==='drop'||t.st==='done';}).sort(function(a,b){return (a.doneAt||a.at||0)-(b.doneAt||b.at||0);});
+  if(!moves.length)return null;
   var h=st.picks.map(function(p){return {mid:p.mid,key:p.key};});
   function idx(mid,key){for(var i=0;i<h.length;i++){if(h[i].mid===mid&&h[i].key===key)return i;}return -1;}
-  done.forEach(function(t){
+  moves.forEach(function(t){
+    if(t.kind==='add'){if(idx(t.mid,t.key)<0)h.push({mid:t.mid,key:t.key});return;}
+    if(t.kind==='drop'){var di=idx(t.mid,t.key);if(di>=0)h.splice(di,1);return;}
     var ok=t.g.every(function(k){return idx(t.f,k)>=0&&idx(t.t,k)<0;})&&t.r.every(function(k){return idx(t.t,k)>=0&&idx(t.f,k)<0;});
     if(!ok)return;
     t.g.forEach(function(k){h.splice(idx(t.f,k),1);});t.r.forEach(function(k){h.splice(idx(t.t,k),1);});
@@ -543,14 +561,20 @@ function applyPicks(mutator){
   if(MODE==='live')S.picks=backup;
   commitPicks(list,backup.length);
 }
+function draftClockMs(){return Math.max(0,(S.draftClock===undefined?90:S.draftClock))*1000;}
+function nextDeadline(picksLen){
+  if(picksLen>=n()*ROSTER||!draftClockMs())return null;
+  return Date.now()+draftClockMs();
+}
 function commitPicks(list,baseLen){
   if(MODE==='live'){
     if((RAWL.picks||[]).length!==baseLen){toast('Someone else just made a pick. Refreshing the board.');rebuildLive();render(true);return;}
-    dbSet('draft/picks',{l:list.map(function(p){return {m:p.mid,k:p.key};})});
+    dbSet('draft/picks',{l:list.map(function(p){return {m:p.mid,k:p.key};}),dl:nextDeadline(list.length)});
     return;
   }
   S.picks=list.map(function(p,i){return {mid:p.mid,key:p.key,n:i+1};});
   S.phase=S.picks.length>=n()*ROSTER?'season':'draft';
+  S.draftDeadline=nextDeadline(S.picks.length);
   save();
 }
 function pushPick(key){var oc=onClock();if(oc)S.picks.push({mid:oc.mid,key:key,n:oc.overall});}
@@ -574,9 +598,79 @@ function objToSched(o,weeks){var out=[];for(var w=1;w<=weeks;w++){out.push(((o&&
 
 /* ---------- simulation ---------- */
 function pois(mean){var L=Math.exp(-mean),k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
+var PGAME={NFL:{ot:.06,so:.03,mw:2.9,ml:1.5},MLB:{ot:.09,so:.07,mw:1.5,ml:.7},NBA:{ot:.06,so:0,mw:0,ml:0},NHL:{ot:.22,so:.07,mw:3.4,ml:1.9}};
+function winProb(a,b){return 1/(1+Math.exp(-(a-b)*5));}
+function teamProjection(t){
+  var meta=META[t.sport],P=PGAME[t.sport],p=winProb(t.strength,0.5);
+  var expW=meta.gpw*p,expL=meta.gpw*(1-p),expOT=meta.gpw*P.ot,expSO=meta.gpw*P.so*p;
+  var evPerGame=p*P.mw+(1-p)*P.ml,evPts=t.sport==='NFL'?S.scoring.td:t.sport==='NBA'?0:S.scoring.goal;
+  return expW*S.scoring.win+expL*S.scoring.loss+expOT*S.scoring.ot+expSO*S.scoring.so+evPerGame*meta.gpw*evPts;
+}
+function managerProjection(mid){
+  var L=getLineup(mid),t=0;
+  starters().forEach(function(s){var k=L[s.id];if(k)t+=teamProjection(TEAM[k]);});
+  return t;
+}
+function sampleTeamWeek(t){
+  var meta=META[t.sport],P=PGAME[t.sport],p=winProb(t.strength,0.5),w=0,l=0,ot=0,so=0,ev=0;
+  for(var g=0;g<meta.gpw;g++){
+    var win=Math.random()<p,isOT=Math.random()<P.ot,isSO=!isOT&&Math.random()<P.so;
+    if(win){w++;if(isOT)ot++;if(isSO)so++;ev+=P.mw?pois(P.mw):0;}else{l++;if(isOT)ot++;ev+=P.ml?pois(P.ml):0;}
+  }
+  return {w:w,l:l,ot:ot,so:so,ev:ev};
+}
+function matchupWinPct(midA,midB,trials){
+  trials=trials||250;
+  var La=getLineup(midA),Lb=getLineup(midB);
+  var teamsA=starters().map(function(s){return La[s.id];}).filter(Boolean).map(function(k){return TEAM[k];});
+  var teamsB=starters().map(function(s){return Lb[s.id];}).filter(Boolean).map(function(k){return TEAM[k];});
+  if(!teamsA.length&&!teamsB.length)return .5;
+  var winsA=0;
+  for(var i=0;i<trials;i++){
+    var ta=0,tb=0;
+    teamsA.forEach(function(t){ta+=teamPts(t.sport,sampleTeamWeek(t));});
+    teamsB.forEach(function(t){tb+=teamPts(t.sport,sampleTeamWeek(t));});
+    if(ta>tb)winsA++;else if(ta===tb)winsA+=.5;
+  }
+  return winsA/trials;
+}
+function heldCount(key){return held().filter(function(h){return h.key===key;}).length;}
+function actingManager(){return MODE==='live'?ME:(UI.viewMid&&mgr(UI.viewMid)?UI.viewMid:(S.managers[0]&&S.managers[0].id));}
+function dropTeam(mid,key){
+  if(!mgr(mid)||rosterKeys(mid).indexOf(key)<0)return;
+  if(isLocked()&&!isComm()){toast('Rosters are locked until the commissioner unlocks them.');return;}
+  var t=TEAM[key];
+  if(MODE==='live'){var id=newId('d'),doc={kind:'drop',mid:mid,key:key,at:Date.now()};RAWL.trades[id]=Object.assign({id:id},doc);dbSet('trades/'+id,doc);rebuildLive();}
+  else{S.trades=S.trades||[];S.trades.push({id:newId('d'),kind:'drop',mid:mid,key:key,at:Date.now()});syncHoldings(S);save();}
+  postChat(mgr(mid).name+' dropped the '+t.nick+'.',true);
+  toast('Dropped the '+t.nick+'.');
+}
+function addTeam(mid,key){
+  if(!mgr(mid))return;
+  if(isLocked()&&!isComm()){toast('Rosters are locked until the commissioner unlocks them.');return;}
+  if(heldCount(key)>=(S.maxOwners||1)){toast('That team is already owned.');return;}
+  if(rosterKeys(mid).length>=ROSTER){toast('Drop a team first to make room.');return;}
+  var t=TEAM[key];
+  if(MODE==='live'){var id=newId('a'),doc={kind:'add',mid:mid,key:key,at:Date.now()};RAWL.trades[id]=Object.assign({id:id},doc);dbSet('trades/'+id,doc);rebuildLive();}
+  else{S.trades=S.trades||[];S.trades.push({id:newId('a'),kind:'add',mid:mid,key:key,at:Date.now()});syncHoldings(S);save();}
+  postChat(mgr(mid).name+' picked up the '+t.nick+'.',true);
+  toast('Picked up the '+t.nick+'.');
+}
+function lockStatusText(){
+  if(!S.lock)return 'Unlocked';
+  if(S.lock.on)return 'Rosters are locked';
+  if(S.lock.at){if(Date.now()>=S.lock.at)return 'Rosters are locked (scheduled)';return 'Unlocked \u2014 locks '+new Date(S.lock.at).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'});}
+  return 'Unlocked';
+}
+function clockText(){
+  if(!draftClockMs())return 'No limit';
+  var dl=S.draftDeadline;if(!dl)return '';
+  var rem=Math.max(0,dl-Date.now()),secs=Math.ceil(rem/1000);
+  return Math.floor(secs/60)+':'+(secs%60<10?'0':'')+(secs%60);
+}
 function playGame(sp,a,b,stats){
   var pa=1/(1+Math.exp(-(a.strength-b.strength)*5)),aw=Math.random()<pa,W=aw?a:b,Lz=aw?b:a;
-  var P={NFL:{ot:.06,so:.03,mw:2.9,ml:1.5},MLB:{ot:.09,so:.07,mw:1.5,ml:.7},NBA:{ot:.06,so:0,mw:0,ml:0},NHL:{ot:.22,so:.07,mw:3.4,ml:1.9}}[sp];
+  var P=PGAME[sp];
   var ot=Math.random()<P.ot,so=!ot&&Math.random()<P.so,ew=P.mw?pois(P.mw):0,el=P.ml?pois(P.ml):0;
   if(so)el=0;if(P.mw&&ew<el)ew=el;if(so&&P.mw&&ew===0)ew=1;
   stats[W.key].w++;stats[Lz.key].l++;
@@ -628,6 +722,8 @@ function rebuildLive(){
   st.managers=order.map(function(id){var ov=OVER.member[id];return {id:id,name:ov&&ov.team!==undefined?ov.team:(mem[id].team||'Team'),logo:mem[id].logo||''};});
   var valid={};st.managers.forEach(function(m){valid[m.id]=1;});
   st.picks=(RAWL.picks||[]).filter(function(p){return valid[p.m]&&TEAM[p.k];}).map(function(p,i){return {mid:p.m,key:p.k,n:i+1};});
+  st.draftDeadline=st.picks.length===((RAWL.picks||[]).length)?RAWL.deadline:null;
+  st.draftClock=c.draftClock===undefined?90:c.draftClock;
   Object.keys(RAWL.lineups).forEach(function(id){st.lineups[id]=RAWL.lineups[id];});
   Object.keys(RAWL.stats).forEach(function(w){
     if(OVER.stats[w]&&S.stats[w]){st.stats[w]=S.stats[w];return;}
@@ -636,6 +732,7 @@ function rebuildLive(){
   Object.keys(OVER.stats).forEach(function(w){if(OVER.stats[w]&&!st.stats[w]&&S.stats[w])st.stats[w]=S.stats[w];});
   Object.keys(RAWL.final).forEach(function(w){st.final[w]=RAWL.final[w];});
   st.maxManagers=c.maxManagers||6;st.tradeApproval=!!c.tradeApproval;
+  st.lock=c.lock||{on:false,at:null};
   st.trades=Object.keys(RAWL.trades).map(function(id){return RAWL.trades[id];}).sort(function(a,b){return (a.at||0)-(b.at||0);});
   st.holdings=computeHoldings(st);
   st.schedule=objToSched(c.schedule,st.weeks);
@@ -717,12 +814,12 @@ function refreshProfiles(){
 function subErr(e){var c=(e&&e.code)||'error';toast(c==='permission-denied'?'Firestore is blocking this request. Publish firestore.rules in your Firebase project.':'Live sync problem ('+c+').');}
 function subscribeAll(){
   DB.doc('league/main').onSnapshot(function(s){RAWL.cfg=s.exists?s.data():null;if(BACKEND==='firebase')IS_ADMIN=!!(RAWL.cfg&&RAWL.cfg.admin===ME);gotFirst('cfg');onLiveChange();},subErr);
-  DB.doc('draft/picks').onSnapshot(function(s){var d=s.exists?s.data():null;RAWL.picks=d&&Array.isArray(d.l)?d.l:[];gotFirst('picks');onLiveChange();},subErr);
+  DB.doc('draft/picks').onSnapshot(function(s){var d=s.exists?s.data():null;RAWL.picks=d&&Array.isArray(d.l)?d.l:[];RAWL.deadline=d?d.dl||null:null;gotFirst('picks');onLiveChange();},subErr);
   DB.collection('members').onSnapshot(function(q){var m={};q.docs.forEach(function(d){m[d.id]=d.data();});RAWL.members=m;gotFirst('members');onLiveChange();},subErr);
   DB.collection('lineups').onSnapshot(function(q){var m={};q.docs.forEach(function(d){var x=d.data();if(x&&x.s)m[d.id]=x.s;});RAWL.lineups=m;gotFirst('lineups');onLiveChange();},subErr);
   DB.collection('stats').onSnapshot(function(q){var m={};q.docs.forEach(function(d){var x=d.data();if(x&&x.t)m[+d.id.slice(1)]=x.t;});RAWL.stats=m;gotFirst('stats');onLiveChange();},subErr);
   DB.collection('final').onSnapshot(function(q){var m={};q.docs.forEach(function(d){var x=d.data();if(x&&x.scores)m[+d.id.slice(1)]=x;});RAWL.final=m;gotFirst('final');onLiveChange();},subErr);
-  DB.collection('trades').onSnapshot(function(q){var m={};q.docs.forEach(function(d){var x=d.data();if(x&&x.f&&x.t)m[d.id]=Object.assign({id:d.id},x);});RAWL.trades=m;gotFirst('trades');onLiveChange();},subErr);
+  DB.collection('trades').onSnapshot(function(q){var m={};q.docs.forEach(function(d){var x=d.data();if(x&&((x.f&&x.t)||x.kind))m[d.id]=Object.assign({id:d.id},x);});RAWL.trades=m;gotFirst('trades');onLiveChange();},subErr);
   DB.collection('chat').orderBy('at','desc').limit(200).onSnapshot(function(q){RAWL.chat=q.docs.map(function(d){return Object.assign({id:d.id},d.data());});gotFirst('chat');onLiveChange();},subErr);
   setTimeout(function(){if(!LIVE_READY)liveReady();},4000);
 }
@@ -980,7 +1077,9 @@ function viewLeague(){
       '<div class="grid2" style="gap:14px"><label class="field"><span>Regular season weeks</span><input class="inp" type="number" min="1" max="20" value="'+S.weeks+'" data-in="weeks"'+(locked?' disabled':'')+'></label>'+
       '<label class="field"><span>Draft order</span><select class="sel" data-in="snake"'+(locked?' disabled':'')+'><option value="1"'+(S.snake?' selected':'')+'>Snake (reverses each round)</option><option value="0"'+(!S.snake?' selected':'')+'>Same order every round</option></select></label></div>'+
       '<div class="grid2" style="gap:14px"><label class="field"><span>Teams in the league</span><select class="sel" data-in="maxmgr"'+(locked?' disabled':'')+'>'+mmOpts+'</select></label>'+
-      '<label class="field"><span>Trades</span><select class="sel" data-in="tradeapp"'+((live&&!comm)?' disabled':'')+'><option value="0"'+(!S.tradeApproval?' selected':'')+'>Happen when accepted</option><option value="1"'+(S.tradeApproval?' selected':'')+'>Commissioner approves each</option></select></label></div>'+
+      '<label class="field"><span>Draft pick timer</span><input class="inp" type="number" min="0" max="600" step="5" value="'+(S.draftClock===undefined?90:S.draftClock)+'" data-in="draftclock"'+(locked?' disabled':'')+'></label></div>'+
+      '<p class="hint">Seconds per draft pick before it\'s made automatically. 0 turns the timer off. Default is 90 (1:30).</p>'+
+      '<div class="grid2" style="gap:14px"><label class="field"><span>Trades</span><select class="sel" data-in="tradeapp"'+((live&&!comm)?' disabled':'')+'><option value="0"'+(!S.tradeApproval?' selected':'')+'>Happen when accepted</option><option value="1"'+(S.tradeApproval?' selected':'')+'>Commissioner approves each</option></select></label></div>'+
       '<label class="field"><span>Managers who can own the same team</span><select class="sel" data-in="owners"'+(locked?' disabled':'')+'>'+[1,2,3,4].map(function(o){return '<option value="'+o+'"'+(S.maxOwners===o?' selected':'')+'>'+(o===1?'One owner per team':'Up to '+o+' owners per team')+' (up to '+hardCap(o)+' managers)';}).join('</option>')+'</option></select></label>'+
       '<p class="hint">There are 124 real teams and each roster takes '+ROSTER+', so one owner per team allows up to '+hardCap(1)+' managers. The default league size is 6.</p></div></div>';
   var managers='<div class="card"><h2 class="display">Managers</h2><p class="hint" style="margin-bottom:16px">Order below is the draft order'+(S.snake?', reversing each round':'')+'. Up to '+cap+' managers in this league.</p>'+mg+
@@ -1026,7 +1125,9 @@ function viewDraft(){
   if(UI.view==='board')left+=boardHtml();
   else left+='<div class="bar">'+seg('pool',UI.pool,SPORT_SEG)+'<input class="inp" type="search" placeholder="Search teams" aria-label="Search teams" value="'+esc(UI.q)+'" data-in="poolq"><select class="sel" data-in="poolsort" aria-label="Sort teams"><option value="best"'+(UI.sort==='best'?' selected':'')+'>Best record first</option><option value="az"'+(UI.sort==='az'?' selected':'')+'>A to Z</option></select></div>'+(can?'':'<p class="hint" style="margin-bottom:10px">It\'s '+esc(m.name)+'\'s pick. You can browse teams while you wait.</p>')+'<div id="pool">'+poolHtml()+'</div>'+recordsNote();
   var mgrLine=MODE==='live'&&person(m.id)?'<div class="sub">'+esc(person(m.id))+'</div>':'';
-  return '<div class="card clock"><div class="ident" style="gap:16px">'+avatar(m,'xl')+'<div><div class="kicker">On the clock</div><div class="clock-name display">'+esc(m.name)+'</div>'+mgrLine+'<div class="sub">Round '+oc.round+' of '+ROSTER+', pick '+oc.pick+' of '+n()+' (overall '+oc.overall+' of '+n()*ROSTER+')'+(nx.length?'. Next: '+nx.map(function(x){return esc(x.name);}).join(', '):'')+'</div></div></div>'+
+  var dcPct=draftClockMs()&&S.draftDeadline?Math.max(0,Math.min(100,(S.draftDeadline-Date.now())/draftClockMs()*100)):100;
+  var clockHtml=draftClockMs()?'<div class="dclock"><div class="dc-num display" id="draftClockNum">'+esc(clockText())+'</div><div class="dc-bar"><div id="draftClockBar" style="width:'+dcPct+'%"></div></div></div>':'<div class="dclock off"><span class="hint" id="draftClockNum">No pick timer</span></div>';
+  return '<div class="card clock"><div class="ident" style="gap:16px">'+avatar(m,'xl')+'<div><div class="kicker">On the clock</div><div class="clock-name display">'+esc(m.name)+'</div>'+mgrLine+'<div class="sub">Round '+oc.round+' of '+ROSTER+', pick '+oc.pick+' of '+n()+' (overall '+oc.overall+' of '+n()*ROSTER+')'+(nx.length?'. Next: '+nx.map(function(x){return esc(x.name);}).join(', '):'')+'</div></div>'+clockHtml+'</div>'+
     '<div class="row">'+(can?'<button class="btn btn-primary" data-act="autopick">Auto-pick</button>':'')+(comm?'<button class="btn" data-act="undo"'+(S.picks.length?'':' disabled')+'>Undo last pick</button><button class="btn" data-act="autoall">Auto-draft the rest</button>':'')+'</div></div>'+
     '<div class="draft-layout"><div>'+left+'</div><aside class="side"><div class="card"><h3>'+(mine.id===ME?'Your roster':esc(mine.name)+'\'s roster')+' ('+rosterKeys(mine.id).length+' of '+ROSTER+')</h3><div style="margin-top:12px">'+lineupHtml(mine.id,{compact:true,blankText:''})+'</div></div><div class="card"><h3>Recent picks</h3><div class="picklog">'+recent+'</div></div></aside></div>';
 }
@@ -1036,13 +1137,15 @@ function viewRosters(){
   var def=MODE==='live'&&ME&&mgr(ME)?ME:S.managers[0].id;
   var mid=UI.viewMid&&mgr(UI.viewMid)?UI.viewMid:def;UI.viewMid=mid;var m=mgr(mid),mine=canAct(mid);
   var pills=S.managers.map(function(x){return '<button class="pill" data-act="viewmgr" data-id="'+x.id+'" aria-pressed="'+(x.id===mid)+'">'+avatar(x)+'<span>'+esc(x.name)+(x.id===ME?' (you)':'')+' <small>'+rosterKeys(x.id).length+'/'+ROSTER+'</small></span></button>';}).join('');
-  var wp=weekPoints(mid,UI.week).total;
+  var wp=weekPoints(mid,UI.week).total,proj=Math.round(managerProjection(mid));
   var weekOpts='';for(var w=1;w<=S.weeks;w++)weekOpts+='<option value="'+w+'"'+(w===UI.week?' selected':'')+'>Week '+w+'</option>';
-  var canWeek=S.phase==='season';
-  return '<div class="pills">'+pills+'</div><div class="rhead"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">'+esc(m.name)+'</h2><p class="hint">'+(mine?'Tap a team, then tap where it should go. Highlighted spots are legal moves. Changes apply to weeks that aren\'t final yet.':'You\'re viewing '+esc(m.name)+'\'s lineup. Only they (or the commissioner) can change it.')+'</p></div>'+
-    (canWeek?'<div class="row"><select class="sel" style="width:auto" data-in="week" aria-label="Week">'+weekOpts+'</select><div class="big-total"><b class="display">'+fmt(wp)+'</b><span>Week '+UI.week+'</span></div></div>':'')+'</div>'+
+  var canWeek=S.phase==='season',locked=isLocked(),editable=mine&&!(locked&&!isComm());
+  var dtVal=S.lock.at?new Date(S.lock.at-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):'';
+  var lockHtml=canWeek?'<div class="strip'+(locked?' hot':'')+'"><span id="lockStatusText">'+esc(lockStatusText())+'</span>'+(isComm()?'<div class="row">'+(locked?'<button class="btn btn-sm" data-act="lock-off">Unlock now</button>':'<button class="btn btn-sm btn-primary" data-act="lock-on">Lock now</button>')+'<input class="inp" type="datetime-local" style="width:auto" data-in="lockat" value="'+dtVal+'" aria-label="Schedule lock time">'+(S.lock.at?'<button class="btn btn-sm" data-act="lock-clear">Clear</button>':'')+'</div>':'')+'</div>':'';
+  return lockHtml+'<div class="pills">'+pills+'</div><div class="rhead"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">'+esc(m.name)+'</h2><p class="hint">'+(!mine?'You\'re viewing '+esc(m.name)+'\'s lineup. Only they (or the commissioner) can change it.':locked&&!isComm()?'Rosters are locked, so lineups can\'t be changed right now.':'Tap a team, then tap where it should go. Highlighted spots are legal moves. Changes apply to weeks that aren\'t final yet.')+'</p></div>'+
+    (canWeek?'<div class="row"><select class="sel" style="width:auto" data-in="week" aria-label="Week">'+weekOpts+'</select><div class="big-total"><b class="display">'+fmt(wp)+'</b><span>Week '+UI.week+'</span></div><div class="big-total proj2"><b class="display">'+proj+'</b><span>Projected</span></div></div>':'')+'</div>'+
     (mine?teamEditor(m):'')+
-    '<div class="card">'+lineupHtml(mid,{inter:mine,sel:UI.sel,week:canWeek?UI.week:0})+'</div>'+recordsNote();
+    '<div class="card">'+lineupHtml(mid,{inter:editable,sel:UI.sel,week:canWeek?UI.week:0})+'</div>'+recordsNote();
 }
 
 function matchupSide(mid,w,f,right){
@@ -1061,7 +1164,12 @@ function viewMatchups(){
     if(!mgr(pr[0])||(pr[1]&&!mgr(pr[1])))return '';
     if(!pr[1]){var s=matchupSide(pr[0],w,f);return '<div class="mu"><div class="mu-top" style="grid-template-columns:1fr">'+s.html+'</div><div class="mu-foot"><span>Bye week. No opponent, no game.</span></div></div>';}
     var A=matchupSide(pr[0],w,f),B=matchupSide(pr[1],w,f,true),key=w+'-'+pr[0],open=UI.open[key];
-    return '<div class="mu"><div class="mu-top">'+A.html+'<div class="scorepair display"><span class="sc'+(A.score<0?' neg':'')+(f&&A.score<B.score?' lose':'')+'">'+A.score+'</span><span class="vs">vs</span><span class="sc'+(B.score<0?' neg':'')+(f&&B.score<A.score?' lose':'')+'">'+B.score+'</span></div>'+B.html+'</div>'+
+    var projHtml='';
+    if(!f){
+      var pa=Math.round(managerProjection(pr[0])),pb=Math.round(managerProjection(pr[1])),wp=Math.round(matchupWinPct(pr[0],pr[1])*100);
+      projHtml='<div class="proj"><div class="proj-nums"><span>Proj '+pa+'</span><span>Proj '+pb+'</span></div><div class="winbar"><div class="wa" style="width:'+wp+'%"></div><div class="wb" style="width:'+(100-wp)+'%"></div></div><div class="proj-pct"><span>'+wp+'% to win</span><span>'+(100-wp)+'% to win</span></div></div>';
+    }
+    return '<div class="mu"><div class="mu-top">'+A.html+'<div class="scorepair display"><span class="sc'+(A.score<0?' neg':'')+(f&&A.score<B.score?' lose':'')+'">'+A.score+'</span><span class="vs">vs</span><span class="sc'+(B.score<0?' neg':'')+(f&&B.score<A.score?' lose':'')+'">'+B.score+'</span></div>'+B.html+'</div>'+projHtml+
       (open?'<div class="mu-detail">'+detailCol(pr[0],w,f)+detailCol(pr[1],w,f)+'</div>':'')+
       '<div class="mu-foot"><span>'+(f?'Final':'Live from the stats entered so far')+'</span><button data-act="toggle" data-key="'+key+'" aria-expanded="'+!!open+'">'+(open?'Hide team scoring':'Show team scoring')+'</button></div></div>';
   }).join('');
@@ -1074,7 +1182,7 @@ function scoresTable(){
     if(UI.sc!=='ALL'&&UI.sc!==sp)return;
     var list=TEAMS.filter(function(t){
       if(t.sport!==sp)return false;
-      if(UI.rostered&&!S.picks.some(function(p){return p.key===t.key;}))return false;
+      if(UI.rostered&&!held().some(function(p){return p.key===t.key;}))return false;
       if(q&&(t.name+' '+t.abbr).toLowerCase().indexOf(q)<0)return false;
       return true;
     });
@@ -1082,15 +1190,16 @@ function scoresTable(){
     html+='<tr class="sec-h" style="--sc:'+META[sp].color+'"><td colspan="8">'+sp+' ('+META[sp].gpw+' '+(META[sp].gpw===1?'game':'games')+' per team in a typical week)</td></tr>';
     list.forEach(function(t){
       var x=st[t.key]||{w:0,l:0,ot:0,so:0,ev:0},p=teamPts(sp,x);
-      var own=S.picks.filter(function(pk){return pk.key===t.key;}).map(function(pk){
+      var own=held().filter(function(pk){return pk.key===t.key;}).map(function(pk){
+        var mm=mgr(pk.mid);if(!mm)return '';
         var L=getLineup(pk.mid),inStart=Object.keys(L).some(function(s){return L[s]===t.key&&SLOT[s].type!=='bench';});
-        return avatar(mgr(pk.mid),inStart?'':'dim');
+        return avatar(mm,inStart?'':'dim');
       }).join('');
       var inp=function(field,d2){return '<td><input class="stat-in" type="number" min="0" max="99" inputmode="numeric" value="'+x[field]+'" data-in="stat" data-key="'+t.key+'" data-f="'+field+'" aria-label="'+esc(t.nick)+' '+field+'"'+(dis||d2?' disabled':'')+'></td>';};
       html+='<tr><td><div class="tcell">'+crest(t,30)+'<span>'+esc(t.name)+'</span></div></td><td><div class="row" style="gap:3px;flex-wrap:nowrap">'+own+'</div></td>'+inp('w')+inp('l')+inp('ot')+inp('so')+inp('ev',sp==='NBA')+'<td class="pt" data-pts="'+t.key+'">'+fmt(p)+'</td></tr>';
     });
   });
-  if(!html)return '<div class="empty">No teams match. Try turning off &ldquo;Only drafted teams&rdquo;.</div>';
+  if(!html)return '<div class="empty">No teams match. Try turning off &ldquo;Rostered only&rdquo;.</div>';
   return '<div class="tbl-wrap"><table><thead><tr><th>Team</th><th>Owner</th><th>Wins</th><th>Losses</th><th>OT games</th><th>Shutouts</th><th>TD / HR / Goals</th><th>Points</th></tr></thead><tbody>'+html+'</tbody></table></div>';
 }
 function viewScores(){
@@ -1098,7 +1207,7 @@ function viewScores(){
   if(S.phase!=='season')return gate('Stat entry opens once the draft is complete.','Go to the draft',S.phase==='setup'?'league':'draft');
   var w=UI.week,f=!!S.final[w],comm=isComm();
   return '<div class="rhead" style="margin-top:0"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">Stats for week '+w+'</h2><p class="hint">'+(!comm?'The commissioner enters these. You can follow every team here.':f?'This week is final. Reopen it on the Matchups tab to edit.':'Enter what each team did this week. Points update as you type. Owner circles that look faded are on a bench.')+'</p></div>'+(comm?'<div class="row"><button class="btn" data-act="sim"'+(f?' disabled':'')+'>Fill with a simulated week</button><button class="btn" data-act="clear"'+(f?' disabled':'')+'>Clear week</button></div>':'')+'</div>'+
-    '<div class="bar">'+weekPills()+'</div><div class="bar">'+seg('sc',UI.sc,SPORT_SEG)+'<input class="inp" type="search" placeholder="Search teams" aria-label="Search teams" value="'+esc(UI.tq)+'" data-in="tq"><label class="row hint" style="gap:8px"><input type="checkbox" data-in="rostered"'+(UI.rostered?' checked':'')+'> Only drafted teams</label></div>'+
+    '<div class="bar">'+weekPills()+'</div><div class="bar">'+seg('sc',UI.sc,SPORT_SEG)+'<input class="inp" type="search" placeholder="Search teams" aria-label="Search teams" value="'+esc(UI.tq)+'" data-in="tq"><label class="row hint" style="gap:8px"><input type="checkbox" data-in="rostered"'+(UI.rostered?' checked':'')+'> Rostered only</label></div>'+
     '<div class="legend"><span>Win '+fmt(S.scoring.win)+'</span><span>Loss '+fmt(S.scoring.loss)+'</span><span>Overtime game '+fmt(S.scoring.ot)+'</span><span>Shutout '+fmt(S.scoring.so)+'</span><span>Goal or home run '+fmt(S.scoring.goal)+'</span><span>Touchdown '+fmt(S.scoring.td)+'</span></div><div id="stbl">'+scoresTable()+'</div>'+
     '<p class="hint" style="margin-top:12px">No live game feed is connected, so results are entered by hand or simulated. Overtime means the game went to overtime or extra innings; count it once for each team that played in it.</p>';
 }
@@ -1107,10 +1216,10 @@ function viewStandings(){
   if(S.phase!=='season')return gate('Standings begin once the draft is complete.','Go to the draft',S.phase==='setup'?'league':'draft');
   var st=standings(),played=Object.keys(S.final).length;
   var body=st.map(function(r,i){var m=mgr(r.mid);if(!m)return '';return '<tr><td>'+(i+1)+'</td><td><div class="tcell">'+avatar(m)+'<span>'+esc(m.name)+(r.mid===ME?' (you)':'')+'</span></div></td><td>'+r.w+'</td><td>'+r.l+'</td><td>'+r.t+'</td><td>'+r.pf+'</td><td>'+r.pa+'</td><td>'+fmt(r.pf-r.pa)+'</td></tr>';}).join('');
-  var teams=TEAMS.filter(function(t){return S.picks.some(function(p){return p.key===t.key;});}).map(function(t){return {t:t,p:seasonPts(t.key)};}).sort(function(a,b){return b.p-a.p;}).slice(0,10);
+  var teams=TEAMS.filter(function(t){return held().some(function(p){return p.key===t.key;});}).map(function(t){return {t:t,p:seasonPts(t.key)};}).sort(function(a,b){return b.p-a.p;}).slice(0,10);
   var hasStats=Object.keys(S.stats).length>0;
   var lead=teams.map(function(x,i){
-    var owners=S.picks.filter(function(p){return p.key===x.t.key;}).map(function(p){var pm=mgr(p.mid);return esc(pm?pm.name:'?');}).join(', ');
+    var owners=held().filter(function(p){return p.key===x.t.key;}).map(function(p){var pm=mgr(p.mid);return esc(pm?pm.name:'?');}).join(', ');
     return '<tr><td>'+(i+1)+'</td><td><div class="tcell">'+crest(x.t,30)+'<span>'+esc(x.t.name)+'</span></div></td><td><span class="sp" style="--sc:'+META[x.t.sport].color+'">'+x.t.sport+'</span></td><td>'+owners+'</td><td class="pt">'+fmt(x.p)+'</td></tr>';
   }).join('');
   return '<div class="rhead" style="margin-top:0"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">Standings</h2><p class="hint">'+played+' of '+S.weeks+' weeks final. Ties in the table are broken by points scored.</p></div></div>'+
@@ -1124,12 +1233,21 @@ function viewTeams(){
   var list=TEAMS.filter(function(t){return (UI.tsport==='ALL'||t.sport===UI.tsport)&&(!q||(t.name+' '+t.abbr).toLowerCase().indexOf(q)>=0);});
   var hasStats=Object.keys(S.stats).length>0;
   list.sort(function(a,b){return hasStats?seasonPts(b.key)-seasonPts(a.key):b.strength-a.strength;});
+  var acting=actingManager(),actingOk=S.phase==='season'&&mgr(acting),actingFull=actingOk&&rosterKeys(acting).length>=ROSTER,locked=isLocked()&&!isComm();
   var tiles=list.map(function(t){
-    var own=S.picks.filter(function(p){return p.key===t.key;}).map(function(p){var pm=mgr(p.mid);return pm?avatar(pm):'';}).join('');
+    var owners=held().filter(function(p){return p.key===t.key;});
+    var own=owners.map(function(p){var pm=mgr(p.mid);return pm?avatar(pm):'';}).join('');
+    var mine=actingOk&&owners.some(function(p){return p.mid===acting;});
+    var openSpot=heldCount(t.key)<(S.maxOwners||1);
     var extra=(own?'<div class="owner-tags">'+own+'</div>':'<span class="pct">Undrafted</span>')+(hasStats?'<div class="pct">'+fmt(seasonPts(t.key))+' fantasy pts</div>':'');
+    if(actingOk&&!locked){
+      if(mine)extra+='<button class="btn btn-sm" style="margin-top:6px" data-act="drop" data-key="'+t.key+'">Drop</button>';
+      else if(openSpot)extra+='<button class="btn btn-sm btn-primary" style="margin-top:6px" data-act="pickup" data-key="'+t.key+'"'+(actingFull?' disabled title="Drop a team first to make room"':'')+'>Pick up</button>';
+    }
     return tile(t,{extra:extra});
   }).join('');
-  return '<div class="rhead" style="margin-top:0"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">All 124 teams</h2><p class="hint">Real teams and standings. Owner circles show who drafted each one.</p></div></div>'+
+  var note=S.phase!=='season'?'':locked?'Rosters are locked, so picking up or dropping teams is off until the commissioner unlocks them.':actingOk?(MODE==='live'?'You can pick up any open team and drop one of your own.':'Acting as '+esc(mgr(acting).name)+' \u2014 switch who you\'re acting as from the Rosters tab.'):'Join the league to pick up or drop teams here.';
+  return '<div class="rhead" style="margin-top:0"><div><h2 class="display" style="font-size:34px;text-transform:uppercase">All 124 teams</h2><p class="hint">Real teams and standings. Owner circles show who currently owns each one.'+(note?' '+esc(note):'')+'</p></div></div>'+
     '<div class="bar">'+seg('tsport',UI.tsport,SPORT_SEG)+'<input class="inp" type="search" placeholder="Search teams" aria-label="Search teams" value="'+esc(UI.tq)+'" data-in="tq2"></div><div class="tiles">'+tiles+'</div>'+recordsNote();
 }
 
@@ -1251,11 +1369,11 @@ function startDraft(){
   UI.tab='draft';UI.view='pool';UI.viewMid=null;UI.week=1;
   if(MODE==='live'){
     clearTimeout(TMR.cfg);
-    var patch=Object.assign({},OVER.cfg,{phase:'draft',order:ids,schedule:schedToObj(sched),weeks:S.weeks,snake:S.snake,maxOwners:S.maxOwners,maxManagers:S.maxManagers,tradeApproval:S.tradeApproval,scoring:S.scoring,name:S.name});
-    dbSet('league/main',Object.assign({},RAWL.cfg||{},patch)).then(function(){RAWL.cfg=Object.assign({},RAWL.cfg||{},patch);OVER.cfg={};rebuildLive();renderSoon();});
+    var patch=Object.assign({},OVER.cfg,{phase:'draft',order:ids,schedule:schedToObj(sched),weeks:S.weeks,snake:S.snake,maxOwners:S.maxOwners,maxManagers:S.maxManagers,tradeApproval:S.tradeApproval,scoring:S.scoring,name:S.name,draftClock:S.draftClock,lock:{on:false,at:null}});
+    dbSet('league/main',Object.assign({},RAWL.cfg||{},patch)).then(function(){RAWL.cfg=Object.assign({},RAWL.cfg||{},patch);OVER.cfg={};rebuildLive();renderSoon();dbSet('draft/picks',{l:[],dl:nextDeadline(0)});});
     return;
   }
-  S.phase='draft';S.picks=[];S.lineups={};S.stats={};S.final={};S.trades=[];S.holdings=null;S.schedule=sched;save();render();
+  S.phase='draft';S.picks=[];S.lineups={};S.stats={};S.final={};S.trades=[];S.holdings=null;S.schedule=sched;S.draftDeadline=nextDeadline(0);S.lock={on:false,at:null};save();render();
 }
 function loadDemo(){
   if(MODE!=='local')PREV_MODE=MODE;
@@ -1271,8 +1389,10 @@ function loadDemo(){
 function exitDemo(){
   MODE=PREV_MODE||'live';PREV_MODE=null;S=MODE==='live'?SL:SD;UI.tab='league';UI.viewMid=null;UI.week=firstOpenWeek();render();
 }
+function isLocked(){return !!(S.lock&&(S.lock.on||(S.lock.at&&Date.now()>=S.lock.at)));}
 function clickSlot(id){
   var mid=UI.viewMid;if(!canAct(mid))return;
+  if(isLocked()&&!isComm()){toast('Rosters are locked until the commissioner unlocks them.');return;}
   var L=Object.assign({},getLineup(mid));
   if(!UI.sel){UI.sel=id;}
   else if(UI.sel===id){UI.sel=null;}
@@ -1367,6 +1487,8 @@ function act(a,el){
     case 'logo-clear':setLogo(el.dataset.id,'');break;
     case 'start-draft':startDraft();break;
     case 'demo':loadDemo();break;
+    case 'drop':dropTeam(actingManager(),el.dataset.key);rerender();break;
+    case 'pickup':addTeam(actingManager(),el.dataset.key);rerender();break;
     case 'exit-demo':exitDemo();break;
     case 'draft':if(canPickNow()){applyPicks(function(){pushPick(el.dataset.key);});afterDraft();}break;
     case 'autopick':if(canPickNow()){applyPicks(autoPickOne);afterDraft();}break;
@@ -1386,7 +1508,10 @@ function act(a,el){
     case 'chat-send':sendChat();break;
     case 'chat-del':if(isComm()&&MODE==='live'){RAWL.chat=RAWL.chat.filter(function(m){return m.id!==el.dataset.id;});dbDelete('chat/'+el.dataset.id);rerender();}break;
     case 'chat-trim':if(isComm()&&MODE==='live'){DB.collection('chat').orderBy('at','asc').limit(1000).get().then(function(q){var docs=q.docs,del=docs.slice(0,Math.max(0,docs.length-50));return Promise.all(del.map(function(d){return dbDelete('chat/'+d.id);}));}).then(function(){toast('Older messages cleared.');});}break;
-    case 'finalize':if(isComm()){var w=UI.week,f=buildFinal(w);if(MODE==='live'){dbSet('final/w'+w,f);RAWL.final[w]=f;rebuildLive();}else{S.final[w]=f;save();}rerender();toast('Week '+w+' is final.');}break;
+    case 'finalize':if(isComm()){var w=UI.week,f=buildFinal(w);if(MODE==='live'){dbSet('final/w'+w,f);RAWL.final[w]=f;applyCfg({lock:{on:false,at:null}});rebuildLive();}else{S.final[w]=f;S.lock={on:false,at:null};save();}rerender();toast('Week '+w+' is final.');}break;
+    case 'lock-on':if(isComm()){applyCfg({lock:{on:true,at:null}});flushCfg();rerender();}break;
+    case 'lock-off':if(isComm()){applyCfg({lock:{on:false,at:null}});flushCfg();rerender();}break;
+    case 'lock-clear':if(isComm()){applyCfg({lock:{on:S.lock.on,at:null}});flushCfg();rerender();}break;
     case 'reopen':if(isComm()){var w2=UI.week;if(MODE==='live'){delete RAWL.final[w2];dbDelete('final/w'+w2);rebuildLive();}else{delete S.final[w2];save();}rerender();}break;
     case 'sim':if(isComm()){simWeek(UI.week);commitStats(UI.week);rerender();toast('Filled week '+UI.week+' with simulated results.');}break;
     case 'clear':if(isComm()){var w3=UI.week;delete S.stats[w3];if(MODE==='live'){delete RAWL.stats[w3];dbDelete('stats/w'+w3);rebuildLive();}else save();rerender();}break;
@@ -1445,6 +1570,8 @@ function onField(e){
     case 'chatmsg':UI.chatDraft=el.value;break;
     case 'maxmgr':applyCfg({maxManagers:+el.value});rerender();break;
     case 'tradeapp':applyCfg({tradeApproval:el.value==='1'});break;
+    case 'draftclock':{var dc=Math.max(0,Math.min(600,parseInt(el.value,10)||0));el.value=dc;applyCfg({draftClock:dc});break;}
+    case 'lockat':{var v=el.value?new Date(el.value).getTime():null;applyCfg({lock:{on:S.lock.on,at:v}});break;}
     case 'stat':{
       if(!isComm())return;
       var w=UI.week;if(S.final[w])return;var x=parseInt(el.value,10);if(isNaN(x)||x<0)x=0;if(x>99)x=99;
@@ -1463,10 +1590,38 @@ document.addEventListener('change',function(e){
     return;
   }
   var el=e.target.closest('[data-in]');if(!el)return;
-  if(['weeks','snake','owners','poolsort','rostered','week','tradefrom','tradeto','maxmgr','tradeapp'].indexOf(el.dataset.in)>=0)onField(e);
+  if(['weeks','snake','owners','poolsort','rostered','week','tradefrom','tradeto','maxmgr','tradeapp','draftclock','lockat'].indexOf(el.dataset.in)>=0)onField(e);
 });
 
 /* theme */
+/* ---------- draft clock tick + lock auto-check ---------- */
+var TICKING=false;
+function forceAutoPickTimeout(){
+  if(S.phase!=='draft')return;var oc=onClock();if(!oc)return;
+  var base=S.picks.length;
+  setTimeout(function(){
+    var oc2=onClock();if(!oc2||S.picks.length!==base)return;
+    applyPicks(autoPickOne);
+    if(S.phase==='season'){afterDraft();}else{rerender();}
+    toast('Time expired. '+(mgr(oc2.mid)?mgr(oc2.mid).name:'A manager')+'\'s pick was made automatically.');
+  },100+Math.floor(Math.random()*900));
+}
+function tick(){
+  if(S.phase==='draft'){
+    var dl=S.draftDeadline,el2=$('#draftClockNum'),bar=$('#draftClockBar');
+    if(dl&&el2){
+      var rem=Math.max(0,dl-Date.now()),secs=Math.ceil(rem/1000);
+      el2.textContent=Math.floor(secs/60)+':'+(secs%60<10?'0':'')+(secs%60);
+      if(bar)bar.style.width=Math.max(0,Math.min(100,rem/draftClockMs()*100))+'%';
+      if(rem<=0&&!TICKING){TICKING=true;forceAutoPickTimeout();setTimeout(function(){TICKING=false;},1500);}
+    }else if(el2){el2.textContent='No limit';if(bar)bar.style.width='100%';}
+  }
+  if(UI.tab==='league'||UI.tab==='rosters'){
+    var lk=$('#lockStatus');
+    if(lk&&S.lock&&S.lock.at&&!S.lock.on&&Date.now()>=S.lock.at&&lk.dataset.state!=='locked')rerender();
+  }
+}
+setInterval(tick,1000);
 try{var th=localStorage.getItem('ff-theme');if(th)document.documentElement.dataset.theme=th;}catch(e){}
 render();
 startLive();
